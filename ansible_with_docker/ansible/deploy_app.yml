@@ -1,43 +1,60 @@
 ---
-- name: Wdrożenie Dockera i aplikacji Evilginx
-  hosts: evilginx_server
-  become: yes
+  - name: Wdrożenie Dockera i aplikacji Evilginx
+    hosts: evilginx_server
+    become: yes
 
-  tasks:
-    - name: Pobranie oficjalnego skryptu instalacyjnego Dockera
-      get_url:
-        url: https://get.docker.com
-        dest: /tmp/get-docker.sh
-        mode: '0755'
+    tasks:
+      - name: Zatrzymaj i wyłącz systemd-resolved (zwalnia port 53)
+        systemd:
+          name: systemd-resolved
+          state: stopped
+          enabled: no
 
-    - name: Instalacja silnika Dockera
-      command: /tmp/get-docker.sh
-      args:
-        creates: /usr/bin/docker # Zapewnia idempotencję (nie uruchomi się, jeśli Docker już jest)
+      - name: Usuń stary plik /etc/resolv.conf (który jest symlinkiem do systemd)
+        file:
+          path: /etc/resolv.conf
+          state: absent
 
-    - name: Instalacja wtyczki Docker Compose
-      apt:
-        name: docker-compose-plugin
-        state: present
-        update_cache: yes
+      - name: Ustaw globalne DNSy od Google (zastępuje usunięty systemd-resolved)
+        copy:
+          dest: /etc/resolv.conf
+          content: "nameserver 8.8.8.8\n"
+          mode: '0644'
 
-    - name: Utworzenie struktury katalogów pod aplikację (/opt/evilginx)
-      file:
-        path: /opt/evilginx/docker/evilginx
-        state: directory
-        mode: '0755'
+      - name: Pobranie oficjalnego skryptu instalacyjnego Dockera
+        get_url:
+          url: https://get.docker.com
+          dest: /tmp/get-docker.sh
+          mode: '0755'
 
-    - name: Wgranie pliku konfiguracyjnego docker-compose.yml
-      copy:
-        src: ../docker-compose.yml
-        dest: /opt/evilginx/docker-compose.yml
+      - name: Instalacja silnika Dockera
+        command: /tmp/get-docker.sh
+        args:
+          creates: /usr/bin/docker # Zapewnia idempotencję (nie uruchomi się, jeśli Docker już jest)
 
-    - name: Wgranie instrukcji budowy Dockerfile
-      copy:
-        src: ../docker/evilginx/Dockerfile
-        dest: /opt/evilginx/docker/evilginx/Dockerfile
+      - name: Instalacja wtyczki Docker Compose
+        apt:
+          name: docker-compose-plugin
+          state: present
+          update_cache: yes
 
-    - name: Budowa obrazu i uruchomienie kontenera w tle
-      command: docker compose up -d --build
-      args:
-        chdir: /opt/evilginx
+      - name: Utworzenie struktury katalogów pod aplikację (/opt/evilginx)
+        file:
+          path: /opt/evilginx/docker/evilginx
+          state: directory
+          mode: '0755'
+
+      - name: Wgranie pliku konfiguracyjnego docker-compose.yml
+        copy:
+          src: ../docker-compose.yml
+          dest: /opt/evilginx/docker-compose.yml
+
+      - name: Wgranie instrukcji budowy Dockerfile
+        copy:
+          src: ../docker/evilginx/Dockerfile
+          dest: /opt/evilginx/docker/evilginx/Dockerfile
+
+      - name: Budowa obrazu i uruchomienie kontenera w tle
+        command: docker compose up -d --build
+        args:
+          chdir: /opt/evilginx
