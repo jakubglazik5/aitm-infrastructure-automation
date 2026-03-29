@@ -10,9 +10,11 @@
 Dla dystrybucji opartych na Debianie/Ubuntu (np. Linux Mint): 
 ```bash
 sudo apt update
-
+```
+```bash
 sudo apt install git
-
+```
+```bash
 sudo apt install ansible
 ```
 
@@ -70,12 +72,13 @@ ssh root@ADRES_IP_TWOJEGO_SERWERA
 Aktualizujemy liste polskich adresów IP:
 ```bash
 cd ~/firewall_scripts
+```
+```bash
 ./update_pl_ips.sh
 ``` 
 
 Otwieramy ruch w celu pobrania certyfikatów (im krócej porty są wystawione na świat, tym mniej skanerów zdąży sprawdzić nasz serwer):
 ```bash
-cd ~/firewall_scripts
 ./open_ports.sh
 ```
 

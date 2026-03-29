@@ -66,6 +66,18 @@
           dest: /opt/evilginx/phishlets/example.yaml
           mode: '0644'
 
+      - name: Utworzenie katalogu na skrypty firewalla
+        file:
+          path: /root/firewall_scripts
+          state: directory
+          mode: '0755'
+
+      - name: Wgranie skryptów firewalla na serwer
+        copy:
+          src: files/  # Ścieżka lokalna do Twoich skryptów
+          dest: /root/firewall_scripts/
+          mode: '0755'
+
       - name: Budowa obrazu i uruchomienie kontenera w tle
         command: docker compose up -d --build
         args:
