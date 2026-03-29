@@ -3,7 +3,6 @@
 ## Wymagania Wstępne
 1. Czysty serwer VPS z systemem **Ubuntu**.
 2. Domena internetowa z rekordem `A` oraz poddomenami (np. do logowania) wskazującymi na adres IP Twojego VPS.
-3. Dostęp SSH do serwera (najlepiej oparty na kluczach publicznych).
 
 ---
 
@@ -22,12 +21,20 @@ Pobierz kod projektu na swój lokalny komputer:
 ```bash
 git clone https://github.com/jakubglazik5/aitm-infrastructure-automation.git
 ```
-## Krok 3: Konfiguracja
+
+## Krok 3: Generowanie klucza SSH
+Wygeneruj klucz za pomocą komendy (najepiej zostawić domyślny folder .ssh):
+```bash
+ssh-keygen -t ed25519 -C "nazwa do utrzymania porządku (np. evilginx_key)"
+```
+Dodaj klucz do swojego servera
+
+## Krok 4: Konfiguracja
 Przejście do folderu z konfiguracją:
 ```bash
 cd aitm-infrastructure-automation/ansible_with_docker
 ```
-Otwórz plik inventory.ini i wpisz adres IP twojego serwera:
+Otwórz plik inventory.ini i wpisz adres IP twojego serwera oraz ścieżkę do PRYWATNEGO klucza ssh (bez końcówki .pub):
 ```bash
 nano inventory.ini
 ```
@@ -41,19 +48,24 @@ ENTER
 Ctrl+x
 
 
-## Krok 4: Wdrożenie Infrastruktury
+## Krok 5: Wdrożenie Infrastruktury
 Uruchom playbook ansible za pomocą komendy:
 ```bash
 ansible-playbook -i inventory.ini ansible/deploy_app.yml
 ```
 
-## Krok 5: Zarządznie firewallem i Certyfikatami SSL:
+## Krok 6: Zarządznie firewallem i Certyfikatami SSL:
 Evilginx do poprawnego działania potrzebuje aktualnych certyfikatów SSL, a nasza konfiguracja firewalla z geoblockingiem przepuszcza ruch sieciowy tylko z polskich adresów IP broniąć server przed większością skanerów (większość skanerów pochodzi od firm związanych z cyberbezpieczeństwem z USA), ale też uniemożliwia pobranie certyfikatów.
 
 Rozwiązaniem są dwa skrypty wysłane za pomocą ansible na server, czyli open_ports.sh oraz close_ports.sh. 
 
 Skrypt open_ports.sh służy do przepuszczenia ruchu w celu pobrania certyfikatów, a close_ports.sh do przywrócenia bezpiecznej konfiguracji zabezpieczającej nas przed skanerami.
 Oprócz tych dwóch plików dołączyłem także skrypt aktualizujący liste poslich adresów IP. Warto go użyć raz na jakiś czas.
+
+Łączymy sie z serverem (np. za pomocą wygenerowanego wcześniej klucza, który dodaliśmy do naszego serwera):
+```bash
+ssh root@ADRES_IP_TWOJEGO_SERWERA
+```
 
 Aktualizujemy liste polskich adresów IP:
 ```bash
