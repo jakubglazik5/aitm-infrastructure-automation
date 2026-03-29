@@ -34,11 +34,11 @@ nano inventory.ini
 
 Zapisz zmiany i wyjdź z edytora:
 
-ctrl o
+Ctrl+o
 
 ENTER
 
-ctrl x
+Ctrl+x
 
 
 ## Krok 4: Wdrożenie Infrastruktury
@@ -92,7 +92,7 @@ config ipv4 "ADRES_IP_TWOJEGO_SERWERA"
 
 Co do użytkowania samego narzędzia oraz pisania własnych phishletów odsyłam was do kursu autora Kuby Gretzkiego oraz poradników na youtube.
 
-## Przydatne komendy:
+## Przydatne komendy i skróty klawiszowe:
 Całkowite wyłączenie narzędzia na poziomie dockera:
 ```bash
 docker compose down
@@ -119,11 +119,11 @@ docker attach evilginx_server
 ```
 
 Wyjście z konsoli narzędzia pozostawiając ją działająca w tle:
-```bash
+
 Ctrl+P
 
 Ctrl+Q
-```
+
 
 Wyjście z konsoli narzędzia przerywając proces:
 ```bash
