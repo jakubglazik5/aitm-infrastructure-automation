@@ -94,6 +94,15 @@ config domain TWOJA_NAZWA_DOMENY
 config ipv4 ADRES_IP_TWOJEGO_SERWERA
 ```
 
+Sprawdzamy czy pobieranie certyfikatóww jest możliwe przy pomocy dołączonego do narzędzia przykładu:
+```bash
+phishlets hostname example TWOJA_NAZWA_DOMENY
+```
+
+```bash
+phishlets enable example
+```
+
 Po pomyślnym pobraniu certyfikatów wychodzimy z evilginx, uszczelniamy z powrotem nasz firewall i wracamy do narzędzia:
 
 Ctrl+P
@@ -104,7 +113,7 @@ Ctrl+Q
 ./close_ports.sh
 ```
 
-Co do użytkowania samego narzędzia oraz pisania własnych phishletów odsyłam was do kursu autora Kuby Gretzkiego oraz poradników na youtube.
+Co do użytkowania samego narzędzia oraz pisania własnych phishletów odsyłam was do kursu autora narzędzia Kuby Gretzkiego oraz poradników na youtube.
 
 ## Przydatne komendy i skróty klawiszowe:
 Całkowite wyłączenie narzędzia na poziomie dockera:

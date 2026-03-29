@@ -18,17 +18,18 @@ else
     exit 1
 fi
 
-# 2. Tworzenie tymczasowego zbioru w ipset
+# 2. Przygotowywanie nowej listy (SZYBKA METODA)
 echo "[2/4] Przygotowywanie nowej listy w pamięci RAM..."
 sudo ipset create $TMP_SET_NAME hash:net --exist
 sudo ipset flush $TMP_SET_NAME
 
-# Wypełnianie tymczasowej listy
-while read -r line; do
-    # Pomijamy puste linie i komentarze
-    [[ -z "$line" || "$line" =~ ^# ]] && continue
-    sudo ipset add $TMP_SET_NAME "$line"
-done < "$TMP_FILE"
+# Tworzymy plik tymczasowy dla ipset restore
+{
+  echo "create $TMP_SET_NAME hash:net --exist"
+  sed -e "s/^/add $TMP_SET_NAME /" "$TMP_FILE"
+} | sudo ipset restore
+
+echo "Załadowano pomyślnie."
 
 # 3. Zamiana zbiorów (Swap)
 echo "[3/4] Podmiana starej listy na nową (bez przerywania ruchu)..."
