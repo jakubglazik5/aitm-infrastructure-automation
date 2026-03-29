@@ -7,8 +7,8 @@
 
 ---
 
-## Krok 1: Instalacja GIT i Ansible lokalnie na komputerze (jeśli jeszcze go nie masz ich zainstalowanych)
-Dla dystrybucji opratych na Debianie/Ubuntu (np. Linux Mint): 
+## Krok 1: Instalacja GIT i Ansible lokalnie na komputerze (jeśli jeszcze nie masz ich zainstalowanych)
+Dla dystrybucji opartych na Debianie/Ubuntu (np. Linux Mint): 
 ```bash
 sudo apt update
 
@@ -22,32 +22,32 @@ Pobierz kod projektu na swój lokalny komputer:
 ```bash
 git clone https://github.com/jakubglazik5/aitm-infrastructure-automation.git
 ```
-## Konfiguracja
-Prejście do folderu z konfiguracją:
+## Krok 3: Konfiguracja
+Przejście do folderu z konfiguracją:
 ```bash
 cd aitm-infrastructure-automation/ansible_with_docker
 ```
-Otwórz plik inventory.ini i wpisz adres IP twojego servera:
+Otwórz plik inventory.ini i wpisz adres IP twojego serwera:
 ```bash
 nano inventory.ini
 ```
 
-Aby zapisać zmiany i wyjść:
-```bash
+Zapisz zmiany i wyjdź z edytora:
+
 ctrl o
 
 ENTER
 
 ctrl x
-```
 
-## Krok 3: Wdrożenie Infrastruktury
+
+## Krok 4: Wdrożenie Infrastruktury
 Uruchom playbook ansible za pomocą komendy:
 ```bash
 ansible-playbook -i inventory.ini ansible/deploy_app.yml
 ```
 
-## Krok 4: Zarządznie firewallem i Certyfikatami SSL:
+## Krok 5: Zarządznie firewallem i Certyfikatami SSL:
 Evilginx do poprawnego działania potrzebuje aktualnych certyfikatów SSL, a nasza konfiguracja firewalla z geoblockingiem przepuszcza ruch sieciowy tylko z polskich adresów IP broniąć server przed większością skanerów (większość skanerów pochodzi od firm związanych z cyberbezpieczeństwem z USA), ale też uniemożliwia pobranie certyfikatów.
 
 Rozwiązaniem są dwa skrypty wysłane za pomocą ansible na server, czyli open_ports.sh oraz close_ports.sh. 
@@ -61,7 +61,7 @@ cd ~/firewall_scripts
 ./update_pl_ips.sh
 ``` 
 
-Otwieramy ruch w celu pobrania certyfikatów (im krócej porty są wystawione na świat, tym mniej skanerów zdąży sprawdzić nasz server):
+Otwieramy ruch w celu pobrania certyfikatów (im krócej porty są wystawione na świat, tym mniej skanerów zdąży sprawdzić nasz serwer):
 ```bash
 cd ~/firewall_scripts
 ./open_ports.sh
@@ -73,15 +73,26 @@ docker attach evilginx_server
 ```
 
 Po pomyślnym pobraniu certyfikatów wychodzimy z evilginx, uszczelniamy z powrotem nasz firewall i wracamy do narzędzia:
-```bash
+
 Ctrl+P
 
 Ctrl+Q
 
+```bash
 ./close_ports.sh
 ```
 
-## Krok 5: Przydatne komendy:
+## Krok 6: Wstępna konfiguracja evilginx
+Do poprawnego działania narzędzia musimy skonfigurować naszą domenę oraz adres IP serwera:
+```bash
+config domain "TWOJA_NAZWA_DOMENY"
+
+config ipv4 "ADRES_IP_TWOJEGO_SERWERA"
+```
+
+Co do użytkowania samego narzędzia oraz pisania własnych phishletów odsyłam was do kursu autora Kuby Gretzkiego oraz poradników na youtube.
+
+## Przydatne komendy:
 Całkowite wyłączenie narzędzia na poziomie dockera:
 ```bash
 docker compose down
@@ -92,19 +103,19 @@ Postawienie kontenera po całkowitym wyłączeniu:
 docker compose up -d
 ```
 
-Zatrzymanie dziłania narzedzia na poziomie dockera:
+Zatrzymanie działania narzedzia na poziomie dockera:
 ```bash
 docker compose stop
 ```
 
-Uruchomienie ZATRZYAMNEGO kontenera:
+Uruchomienie ZATRZYMANEGO kontenera:
 ```bash
 docker compose start
 ```
 
 Uruchomienie narzędzia:
 ```bash
-docker attach evilginx server
+docker attach evilginx_server
 ```
 
 Wyjście z konsoli narzędzia pozostawiając ją działająca w tle:
@@ -123,5 +134,4 @@ Wejście do folderu z phishletami:
 ```bash
 cd /opt/evilginx/phishlets
 ```
-
 
