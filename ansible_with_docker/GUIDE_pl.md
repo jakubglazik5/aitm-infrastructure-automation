@@ -8,7 +8,10 @@
 ---
 
 ## Krok 1: Instalacja Ansible lokalnie na twoim komputerze (jeśli jeszcze go nie masz)
-Linux mint: sudo apt install ansible
+Linux mint: 
+```bash
+sudo apt install ansible
+```
 
 ## Krok 2: Klonowanie Repozytorium
 Pobierz kod projektu na swój lokalny komputer:
@@ -28,7 +31,9 @@ nano inventory.ini
 Aby zapisać zmiany i wyjść:
 ```bash
 ctrl o
+
 ENTER
+
 ctrl x
 ```
 
@@ -60,8 +65,13 @@ Uruchamiamy konsole evilginx:
 docker attach evilginx_server
 ```
 
-Po pomyślnym pobraniu certyfikatów uszczelniamy z powrotem nasz firewall:
+Po pomyślnym pobraniu certyfikatów wychodzimy z evilginx, uszczelniamy z powrotem nasz firewall i wracamy do narzędzia:
 ```bash
+exit
+
 cd ~/firewall_scripts
+
 ./close_ports.sh
+
+docker attach evilginx_server
 ```
