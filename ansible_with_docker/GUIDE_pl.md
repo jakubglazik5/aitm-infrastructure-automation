@@ -86,6 +86,8 @@ Uruchamiamy konsole evilginx:
 ```bash
 docker attach evilginx_server
 ```
+Jeśli w terminalu nic się nie pojawia, klikamy klika razy enter. Powinien pojawić sie znak zachęty ":". To oznacza, że narzędzie jest uruchomione a my znajdujemy sie w głównej konsoli.
+
 Do poprawnego działania narzędzia musimy skonfigurować naszą domenę oraz adres IP serwera:
 ```bash
 config domain TWOJA_NAZWA_DOMENY
@@ -158,3 +160,16 @@ Wejście do folderu z phishletami:
 cd /opt/evilginx/phishlets
 ```
 
+## Porada odnośnie firewalla
+Geoblocking chroni nas przed większością skanerów, jednak Polska również posiada własne boty skanujące internet w poszukiwaniu takich serwerów, jeśli konfiguracja nie jest używana jako prezentacja/szkolenie, a jedynie do domowych testów, zalecam ustawienie drugiego firewalla bezpośrednio w panelu dostawcy waszego VPS. Zwiększy to drastycznie żywotność waszego serwera.
+
+W panelu ustawiamy porty TCP 22, 80 i 443 na adres publiczny naszego routera domowego. 22 jest opcjonalny, ale chroni server przed atakami brute-force na protokół SSH.
+
+Taka konfiguracja zatrzyma resztę skanerów, co umożliwi spokojne testy w obrębie naszej sieci Wi-Fi.
+
+Przy pobieraniu certyfikatów SSL przez Let's Encrypt należy chwilowo przepuścić ruch sieciowy przez porty 80 i 443 z obu firewalli.
+
+Adres publiczny swojego routera sprawdzicie łącząc się do swojej sieci i wpisując komendę:
+```bash
+curl ifconfig.me
+```
