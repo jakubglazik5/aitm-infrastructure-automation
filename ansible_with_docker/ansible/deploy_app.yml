@@ -54,6 +54,18 @@
           src: ../docker/evilginx/Dockerfile
           dest: /opt/evilginx/docker/evilginx/Dockerfile
 
+      - name: Utworzenie katalogu na wtyczki (phishlets)
+        file:
+          path: /opt/evilginx/phishlets
+          state: directory
+          mode: '0755'
+
+      - name: Pobranie przykładowego (edukacyjnego) phishletu z repozytorium
+        get_url:
+          url: https://raw.githubusercontent.com/kgretzky/evilginx2/master/phishlets/example.yaml
+          dest: /opt/evilginx/phishlets/example.yaml
+          mode: '0644'
+
       - name: Budowa obrazu i uruchomienie kontenera w tle
         command: docker compose up -d --build
         args:
