@@ -94,7 +94,7 @@ Ctrl+Q
 ./close_ports.sh
 ```
 
-## Krok 6: Wstępna konfiguracja evilginx
+## Krok 7: Wstępna konfiguracja evilginx
 Do poprawnego działania narzędzia musimy skonfigurować naszą domenę oraz adres IP serwera:
 ```bash
 config domain "TWOJA_NAZWA_DOMENY"
