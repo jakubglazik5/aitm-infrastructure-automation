@@ -1,15 +1,20 @@
-!/bin/bash
+#!/bin/bash
 
-echo "--- TRYB LABORATORIUM: ZAMYKANIE ---"
+echo "--- AKTYWACJA BLOKADY GEOIP (POLSKA) ---"
 
-# Usuwanie reguł zezwalających na ruch globalny
-sudo iptables -D INPUT -p tcp --dport 80 -j ACCEPT
-sudo iptables -D INPUT -p tcp --dport 443 -j ACCEPT
+# 1. Czyszczenie starych reguł w łańcuchu DOCKER-USER (bezpieczne dla Dockera)
+iptables -F DOCKER-USER
 
-# Zapisanie stanu, aby blokada była aktywna po restarcie
-sudo netfilter-persistent save
+# 2. Pozwól na ruch z Polski (ipset 'poland') na porty 80 i 443
+iptables -A DOCKER-USER -p tcp -m multiport --dports 80,443 -m set --match-set poland_ips src -j ACCEPT
 
-echo "Porty 80 i 443 zostały ZAMKNIĘTE dla świata."
-echo "Dostęp do nich mają teraz tylko adresy IP z Polski."
-echo "Twoje laboratorium Evilginx jest ponownie w trybie ukrytym."
+# 3. Pozwól na ruch już nawiązany (żeby nie zerwało Twojego połączenia)
+iptables -A DOCKER-USER -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 
+# 4. BLOKUJ całą resztę świata na portach 80 i 443
+iptables -A DOCKER-USER -p tcp -m multiport --dports 80,443 -j DROP
+
+# 5. Powrót do reszty reguł Dockera
+iptables -A DOCKER-USER -j RETURN
+
+echo "Porty 80/443 są teraz dostępne WYŁĄCZNIE dla IP z Polski."

@@ -86,6 +86,13 @@ Uruchamiamy konsole evilginx:
 ```bash
 docker attach evilginx_server
 ```
+Do poprawnego działania narzędzia musimy skonfigurować naszą domenę oraz adres IP serwera:
+```bash
+config domain TWOJA_NAZWA_DOMENY
+```
+```bash 
+config ipv4 ADRES_IP_TWOJEGO_SERWERA
+```
 
 Po pomyślnym pobraniu certyfikatów wychodzimy z evilginx, uszczelniamy z powrotem nasz firewall i wracamy do narzędzia:
 
@@ -95,14 +102,6 @@ Ctrl+Q
 
 ```bash
 ./close_ports.sh
-```
-
-## Krok 7: Wstępna konfiguracja evilginx
-Do poprawnego działania narzędzia musimy skonfigurować naszą domenę oraz adres IP serwera:
-```bash
-config domain "TWOJA_NAZWA_DOMENY"
-
-config ipv4 "ADRES_IP_TWOJEGO_SERWERA"
 ```
 
 Co do użytkowania samego narzędzia oraz pisania własnych phishletów odsyłam was do kursu autora Kuby Gretzkiego oraz poradników na youtube.

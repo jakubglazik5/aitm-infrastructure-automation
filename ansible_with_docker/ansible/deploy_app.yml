@@ -66,6 +66,12 @@
           dest: /opt/evilginx/phishlets/example.yaml
           mode: '0644'
 
+      - name: Instalacja ipset dla skryptów firewalla
+        apt:
+          name: ipset
+          state: present
+          update_cache: yes
+
       - name: Utworzenie katalogu na skrypty firewalla
         file:
           path: /root/firewall_scripts
