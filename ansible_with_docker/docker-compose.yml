@@ -7,8 +7,8 @@ services:
       dockerfile: Dockerfile
     container_name: evilginx_server
     restart: always
-    tty: true          # <--- Dodane: symuluje terminal
-    stdin_open: true   # <--- Dodane: trzyma otwarte wejście
+    tty: true
+    stdin_open: true
     network_mode: "host"
     volumes:
       - evilginx_data:/root/.evilginx
