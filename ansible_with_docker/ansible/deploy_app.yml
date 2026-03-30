@@ -1,90 +1,90 @@
 ---
-  - name: Wdrożenie Dockera i aplikacji Evilginx
+  - name: Deploy Docker and Evilginx App
     hosts: evilginx_server
     become: yes
 
     tasks:
-      - name: Zatrzymaj i wyłącz systemd-resolved (zwalnia port 53)
+      - name: Disable systemd-resolved (required to use port 53)
         systemd:
           name: systemd-resolved
           state: stopped
           enabled: no
 
-      - name: Usuń stary plik /etc/resolv.conf (który jest symlinkiem do systemd)
+      - name: Remove existing resolv.conf symlink
         file:
           path: /etc/resolv.conf
           state: absent
 
-      - name: Ustaw globalne DNSy od Google (zastępuje usunięty systemd-resolved)
+      - name: Configure Google Public DNS (replaces removed systemd-resolved)
         copy:
           dest: /etc/resolv.conf
           content: "nameserver 8.8.8.8\n"
           mode: '0644'
 
-      - name: Pobranie oficjalnego skryptu instalacyjnego Dockera
+      - name: Download Docker setup script
         get_url:
           url: https://get.docker.com
           dest: /tmp/get-docker.sh
           mode: '0755'
 
-      - name: Instalacja silnika Dockera
+      - name: Install Docker Engine
         command: /tmp/get-docker.sh
         args:
-          creates: /usr/bin/docker # Zapewnia idempotencję (nie uruchomi się, jeśli Docker już jest)
+          creates: /usr/bin/docker
 
-      - name: Instalacja wtyczki Docker Compose
+      - name: Install Docker Compose plugin
         apt:
           name: docker-compose-plugin
           state: present
           update_cache: yes
 
-      - name: Utworzenie struktury katalogów pod aplikację (/opt/evilginx)
+      - name: Create Evilginx directory structure
         file:
           path: /opt/evilginx/docker/evilginx
           state: directory
           mode: '0755'
 
-      - name: Wgranie pliku konfiguracyjnego docker-compose.yml
+      - name: Deploy docker-compose.yml
         copy:
           src: ../docker-compose.yml
           dest: /opt/evilginx/docker-compose.yml
 
-      - name: Wgranie instrukcji budowy Dockerfile
+      - name: Deploy Dockerfile
         copy:
           src: ../docker/evilginx/Dockerfile
           dest: /opt/evilginx/docker/evilginx/Dockerfile
 
-      - name: Utworzenie katalogu na wtyczki (phishlets)
+      - name: Create phishlets directory
         file:
           path: /opt/evilginx/phishlets
           state: directory
           mode: '0755'
 
-      - name: Pobranie przykładowego (edukacyjnego) phishletu z repozytorium
+      - name: Download example phishlet from repository
         get_url:
           url: https://raw.githubusercontent.com/kgretzky/evilginx2/master/phishlets/example.yaml
           dest: /opt/evilginx/phishlets/example.yaml
           mode: '0644'
 
-      - name: Instalacja ipset dla skryptów firewalla
+      - name: Install ipset for firewall configuration
         apt:
           name: ipset
           state: present
           update_cache: yes
 
-      - name: Utworzenie katalogu na skrypty firewalla
+      - name: Create firewall scripts directory
         file:
           path: /root/firewall_scripts
           state: directory
           mode: '0755'
 
-      - name: Wgranie skryptów firewalla na serwer
+      - name: Deploy firewall scripts
         copy:
-          src: files/  # Ścieżka lokalna do Twoich skryptów
+          src: files/
           dest: /root/firewall_scripts/
           mode: '0755'
 
-      - name: Budowa obrazu i uruchomienie kontenera w tle
+      - name: Build image and start Docker container
         command: docker compose up -d --build
         args:
           chdir: /opt/evilginx

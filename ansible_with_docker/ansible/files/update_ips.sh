@@ -4,7 +4,7 @@
 COUNTRY_CODE="pl"
 URL="http://www.ipdeny.com/ipblocks/data/countries/${COUNTRY_CODE}.zone"
 TMP_FILE="/tmp/${COUNTRY_CODE}.zone"
-SET_NAME="poland_ips"
+SET_NAME="country_ips"
 TMP_SET_NAME="${SET_NAME}_temp"
 
 echo "--- Rozpoczynam aktualizację bazy GeoIP dla Polski ---"
@@ -44,5 +44,5 @@ sudo ipset destroy $TMP_SET_NAME
 sudo ipset save > /etc/ipset.conf
 rm $TMP_FILE
 
-echo "--- GOTOWE! Twoja lista IP z Polski jest aktualna ---"
+echo "--- GOTOWE! Twoja lista IP z jest aktualna ---"
 echo "Liczba aktywnych zakresów: $(sudo ipset list $SET_NAME | grep Number | awk '{print $NF}')"

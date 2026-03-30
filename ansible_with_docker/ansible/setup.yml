@@ -1,15 +1,15 @@
 ---
-- name: Konfiguracja bazowa VPS i przygotowanie Firewalla
+- name: Base VPS Configuration and Firewall Setup
   hosts: evilginx_server
   become: yes
 
   tasks:
-    - name: Aktualizacja list pakietów (apt update)
+    - name: Update APT package cache
       apt:
         update_cache: yes
         cache_valid_time: 3600
 
-    - name: Instalacja niezbędnych narzędzi
+    - name: Install required programs
       apt:
         name:
           - ipset
@@ -17,77 +17,77 @@
           - curl
         state: present
 
-    - name: Utworzenie folderu firewall_scripts w katalogu domowym
+    - name: Create directory for firewall scripts
       file:
         path: "{{ ansible_env.HOME }}/firewall_scripts"
         state: directory
         mode: '0755'
 
-    - name: Wgranie Twojego skryptu update_pl_ips.sh
+    - name: Deploy GeoIP update script
       copy:
-        src: files/update_pl_ips.sh
-        dest: "{{ ansible_env.HOME }}/firewall_scripts/update_pl_ips.sh"
+        src: files/update_ips.sh
+        dest: "{{ ansible_env.HOME }}/firewall_scripts/update_ips.sh"
         mode: '0755'
 
-    - name: Wgranie skryptu open_ports.sh (otwieranie 80 i 443)
+    - name: Deploy port opening script (80/443)
       copy:
         src: files/open_ports.sh
         dest: "{{ ansible_env.HOME }}/firewall_scripts/open_ports.sh"
         mode: '0755'
 
-    - name: Wgranie skryptu close_ports.sh (zamykanie 80 i 443)
+    - name: Deploy port closing script (80/443)
       copy:
         src: files/close_ports.sh
         dest: "{{ ansible_env.HOME }}/firewall_scripts/close_ports.sh"
         mode: '0755'
 
-    - name: Pierwsze uruchomienie aktualizacji bazy GeoIP
-      command: "{{ ansible_env.HOME }}/firewall_scripts/update_pl_ips.sh"
+    - name: Initialize GeoIP database
+      command: "{{ ansible_env.HOME }}/firewall_scripts/update_ips.sh"
       register: ipset_result
-      changed_when: "'GOTOWE' in ipset_result.stdout"
+      changed_when: "'FINISHED' in ipset_result.stdout"
 
-    - name: Iptables - Pozwól na ruch z pętli zwrotnej (localhost)
+    - name: Configure iptables - Allow loopback (localhost)
       iptables:
         chain: INPUT
         in_interface: lo
         jump: ACCEPT
 
-    - name: Iptables - Pozwól na połącznia już nawiązane (nie zrywaj obecnych)
+    - name: Configure iptables - Allow established connections
       iptables:
         chain: INPUT
         ctstate: ESTABLISHED,RELATED
         jump: ACCEPT
 
-    - name: Iptables - Pozwól na dostęp do SSH (port 22)
+    - name: Configure iptables - Allow SSH traffic
       iptables:
         chain: INPUT
         protocol: tcp
         destination_port: '22'
         jump: ACCEPT
 
-    - name: Iptables - Pozwól na ruch z Polski (korzysta ze zbioru ipset)
+    - name: Configure iptables - Allow traffic from GeoIP set
       iptables:
         chain: INPUT
         match: set
-        match_set: poland_ips
+        match_set: country_ips
         match_set_flags: src
         jump: ACCEPT
 
-    - name: Iptables - Zablokuj całą resztę (domyślna polityka DROP)
+    - name: Configure iptables - Set default DROP rules
       iptables:
         chain: INPUT
         policy: DROP
 
-    - name: Zapisz reguły firewalla na stałe (iptables-persistent)
+    - name: Save iptables rules
       command: netfilter-persistent save
 
-    - name: Zwolnienie portu 53 (system resolved) - zamiana DNSStubListener
+    - name: Disable DNSStubListener (free port 53)
       lineinfile:
         path: /etc/systemd/resolved.conf
         regexp: '^#?DNSStubListener='
         line: 'DNSStubListener=no'
 
-    - name: Zwolnienie portu 53 - naprawa symlinku dla resolv.conf
+    - name: Recreate resolv.conf symlink
       file:
         src: /run/systemd/resolve/resolv.conf
         dest: /etc/resolv.conf

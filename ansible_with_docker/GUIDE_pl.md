@@ -62,7 +62,7 @@ Evilginx do poprawnego działania potrzebuje aktualnych certyfikatów SSL, a nas
 Rozwiązaniem są dwa skrypty wysłane za pomocą ansible na server, czyli open_ports.sh oraz close_ports.sh. 
 
 Skrypt open_ports.sh służy do przepuszczenia ruchu w celu pobrania certyfikatów, a close_ports.sh do przywrócenia bezpiecznej konfiguracji zabezpieczającej nas przed skanerami.
-Oprócz tych dwóch plików dołączyłem także skrypt aktualizujący liste poslich adresów IP. Warto go użyć raz na jakiś czas.
+Oprócz tych dwóch plików dołączyłem także skrypt aktualizujący liste polskich (domyślnie, można zmienić na inny kraj) adresów IP. Warto go użyć raz na jakiś czas.
 
 Łączymy sie z serverem (np. za pomocą wygenerowanego wcześniej klucza, który dodaliśmy do naszego serwera):
 ```bash
@@ -74,7 +74,7 @@ Aktualizujemy liste polskich adresów IP:
 cd ~/firewall_scripts
 ```
 ```bash
-./update_pl_ips.sh
+./update_ips.sh
 ``` 
 
 Otwieramy ruch w celu pobrania certyfikatów (im krócej porty są wystawione na świat, tym mniej skanerów zdąży sprawdzić nasz serwer):
@@ -173,3 +173,13 @@ Adres publiczny swojego routera sprawdzicie łącząc się do swojej sieci i wpi
 ```bash
 curl ifconfig.me
 ```
+
+Jeśli chodzi przestawienie naszego geoblockingu na adresy ip kraju innego niż Polska, to wystarczy w pliku update_ips.sh zmienić COUNTRY_CODE.
+
+Przykład na podstawie Niemiec:
+
+```bash
+COUNTRY_CODE="de"
+```
+
+Link do strony z listą dwuliterowych kodów państwa, z której korzysta skrypt: http://www.ipdeny.com/ipblocks/
