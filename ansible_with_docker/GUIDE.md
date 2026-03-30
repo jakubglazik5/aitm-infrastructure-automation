@@ -62,7 +62,7 @@ For Evilginx to work correctly, it needs up-to-date SSL certificates, and our fi
 The solution is two scripts sent to the server via ansible: open_ports.sh and close_ports.sh. 
 
 The open_ports.sh script is used to allow traffic in order to download certificates, and close_ports.sh to restore the secure configuration protecting us from scanners.
-In addition to these two files, I also included a script updating the list of Polish IP addresses. It is worth using it from time to time.
+In addition to these two files, I also included a script updating the list of Polish (default, you can change it to another country) IP addresses. It is worth using it from time to time.
 
 We connect to the server (e.g., using the previously generated key that we added to our server):
 ```bash
@@ -74,7 +74,7 @@ Update the list of Polish IP addresses:
 cd ~/firewall_scripts
 ```
 ```bash
-./update_pl_ips.sh
+./update_ips.sh
 ``` 
 
 We open the traffic to download certificates (the shorter the ports are exposed to the world, the fewer scanners will manage to check our server):
@@ -173,3 +173,12 @@ You can check your router's public address by connecting to your network and ent
 ```bash
 curl ifconfig.me
 ```
+
+To switch our geoblocking to the IP addresses of a country other than Poland, simply change the COUNTRY_CODE in the update_ips.sh file.
+
+Example based on Germany:
+```bash
+COUNTRY_CODE="de"
+```
+
+Link to the page with the list of two-letter country codes used by the script: http://www.ipdeny.com/ipblocks/
