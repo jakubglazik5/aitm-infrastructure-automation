@@ -1,20 +1,20 @@
 #!/bin/bash
 
-echo "--- AKTYWACJA BLOKADY GEOIP (POLSKA) ---"
+echo "--- CERTIFICATE MODE: CLOSING ---"
 
-# 1. Czyszczenie starych reguł w łańcuchu DOCKER-USER (bezpieczne dla Dockera)
+# Flush existing DOCKER-USER rules
 iptables -F DOCKER-USER
 
-# 2. Pozwól na ruch z Polski (ipset 'poland') na porty 80 i 443
+# Allow HTTP/HTTPS traffic from the authorized GeoIP set
 iptables -A DOCKER-USER -p tcp -m multiport --dports 80,443 -m set --match-set country_ips src -j ACCEPT
 
-# 3. Pozwól na ruch już nawiązany (żeby nie zerwało Twojego połączenia)
+# Manitain established and related connections to prevent sessions drops
 iptables -A DOCKER-USER -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 
-# 4. BLOKUJ całą resztę świata na portach 80 i 443
+# Drop all other external HTTP/HTTPS traffic
 iptables -A DOCKER-USER -p tcp -m multiport --dports 80,443 -j DROP
 
-# 5. Powrót do reszty reguł Dockera
+# Return to default Docker routing
 iptables -A DOCKER-USER -j RETURN
 
-echo "Porty 80/443 są teraz dostępne WYŁĄCZNIE dla IP z naszego seta."
+echo "Ports 80 and 443 are closed to the IP set."
