@@ -1,0 +1,66 @@
+---
+- name: Deploy Evilginx
+  hosts: evilginx_server
+  become: yes
+
+  vars:
+    install_path: "/opt/evilginx"
+    go_version: "1.23.0"
+
+  tasks:
+    - name: Install system requirements
+      apt:
+        name: [git, make, gcc, wget, tar, ipset, iptables-persistent]
+        state: present
+        update_cache: yes
+
+    - name: Install Golang
+      shell: |
+        wget https://go.dev/dl/go{{ go_version }}.linux-amd64.tar.gz
+        rm -rf /usr/local/go && tar -C /usr/local -xzf go{{ go_version }}.linux-amd64.tar.gz
+      args:
+        creates: /usr/local/go
+
+    - name: Clone and Build Evilginx
+      shell:
+        cmd: |
+          export PATH=$PATH:/usr/local/go/bin
+          git clone https://github.com/kgretzky/evilginx2.git .
+          make
+        chdir: "{{ install_path }}"
+        creates: "{{ install_path }}/build/evilginx"
+
+    - name: Create phishlets directory
+      file:
+        path: "{{ install_path }}/phishlets"
+        state: directory
+
+    - name: Copy firewall scripts
+      copy:
+        src: files/
+        dest: "{{ install_path }}/scripts/"
+        mode: '0755'
+
+    - name: Setup Systemd Service
+      copy:
+        dest: /etc/systemd/system/evilginx.service
+        content: |
+          [Unit]
+          Description=Evilginx Service
+          After=network.target
+
+          [Service]
+          Type=simple
+          WorkingDirectory={{ install_path }}
+          ExecStart={{ install_path }}/build/evilginx -p {{ install_path }}/phishlets
+          Restart=always
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Start Evilginx
+      systemd:
+        name: evilginx
+        state: started
+        enabled: yes
+        daemon_reload: yes

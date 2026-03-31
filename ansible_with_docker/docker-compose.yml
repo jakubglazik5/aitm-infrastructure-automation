@@ -12,7 +12,7 @@ services:
     network_mode: "host"
     volumes:
       - evilginx_data:/root/.evilginx
-      - ./phishlets:/app/phishlets
+      - /opt/evilginx/phishlets:/app/phishlets
 
 volumes:
   evilginx_data:
