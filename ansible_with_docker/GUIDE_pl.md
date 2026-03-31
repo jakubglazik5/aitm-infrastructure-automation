@@ -2,7 +2,7 @@
 
 ## Wymagania Wstępne
 1. Czysty serwer VPS z systemem **Ubuntu**.
-2. Domena internetowa z rekordem `A` oraz poddomenami (np. do logowania) wskazującymi na adres IP Twojego VPS.
+2. Domena internetowa z rekordem `A` oraz subdomeną wildcard `*` wskazującymi na adres IP Twojego VPS.
 
 ---
 
@@ -174,12 +174,20 @@ Adres publiczny swojego routera sprawdzicie łącząc się do swojej sieci i wpi
 curl ifconfig.me
 ```
 
-Jeśli chodzi przestawienie naszego geoblockingu na adresy ip kraju innego niż Polska, to wystarczy w pliku update_ips.sh zmienić COUNTRY_CODE.
+Jeśli chodzi przestawienie naszego geoblockingu na adresy ip kraju innego niż Polska, to wystarczy w pliku update_ips.sh zmienić COUNTRY_CODE. Najlepiej zmienić to przed uruchomieniem pliku inventory.ini.
 
 Przykład na podstawie Niemiec:
 
 ```bash
 COUNTRY_CODE="de"
+```
+
+Jeśli zakończyłeś konfiguracje serwera, ale jednak chcesz zmienić ustawieia geoblockingu na inny kraj, to oprócz powyższego skryptu, musisz wyczyścić wszystkie aktywne połączenia za pomocą komend:
+```bash
+sudo apt install conntrack
+```
+```bash
+sudo conntrack -F
 ```
 
 Link do strony z listą dwuliterowych kodów państwa, z której korzysta skrypt: http://www.ipdeny.com/ipblocks/
