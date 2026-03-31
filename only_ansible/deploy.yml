@@ -10,13 +10,13 @@
   tasks:
     - name: Install system requirements
       apt:
-        name: [git, make, gcc, wget, tar, ipset, iptables-persistent]
+        name: [git, make, gcc, wget, tar, ipset, iptables-persistent, curl]
         state: present
         update_cache: yes
 
     - name: Install Golang
       shell: |
-        wget https://go.dev/dl/go{{ go_version }}.linux-amd64.tar.gz
+        wget -q https://go.dev/dl/go{{ go_version }}.linux-amd64.tar.gz
         rm -rf /usr/local/go && tar -C /usr/local -xzf go{{ go_version }}.linux-amd64.tar.gz
       args:
         creates: /usr/local/go
@@ -30,16 +30,24 @@
         chdir: "{{ install_path }}"
         creates: "{{ install_path }}/build/evilginx"
 
-    - name: Create phishlets directory
+    - name: Create directories
       file:
-        path: "{{ install_path }}/phishlets"
+        path: "{{ item }}"
         state: directory
+      loop:
+        - "{{ install_path }}/phishlets"
+        - "{{ install_path }}/scripts"
 
     - name: Copy firewall scripts
       copy:
         src: files/
         dest: "{{ install_path }}/scripts/"
         mode: '0755'
+
+    # KLUCZOWY DODATEK: Inicjalizacja bazy IP, żeby firewall miał na czym pracować
+    - name: Initialize GeoIP database
+      command: "{{ install_path }}/scripts/update_ips.sh"
+      changed_when: true
 
     - name: Setup Systemd Service
       copy:
