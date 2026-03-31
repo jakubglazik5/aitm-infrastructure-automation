@@ -21,7 +21,7 @@ sudo apt install ansible
 ## Step 2: Cloning the Repository
 Download the project code to your local computer:
 ```bash
-git clone [https://github.com/jakubglazik5/aitm-infrastructure-automation.git](https://github.com/jakubglazik5/aitm-infrastructure-automation.git)
+git clone https://github.com/jakubglazik5/aitm-infrastructure-automation.git
 ```
 
 ## Step 3: Generating an SSH Key

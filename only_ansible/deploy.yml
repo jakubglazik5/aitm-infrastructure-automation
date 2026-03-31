@@ -1,10 +1,11 @@
 ---
-- name: Deploy Evilginx
+- name: Deploy Evilginx Standalone (Manual Setup Mode)
   hosts: evilginx_server
   become: yes
 
   vars:
-    install_path: "/opt/evilginx"
+    install_path: "/usr/share/evilginx"
+    scripts_path: "{{ ansible_env.HOME }}/firewall_scripts"
     go_version: "1.23.0"
 
   tasks:
@@ -14,6 +15,17 @@
         state: present
         update_cache: yes
 
+    - name: Disable systemd-resolved to free port 53
+      systemd:
+        name: systemd-resolved
+        state: stopped
+        enabled: no
+
+    - name: Set static nameserver (DNS fix)
+      copy:
+        dest: /etc/resolv.conf
+        content: "nameserver 1.1.1.1"
+
     - name: Install Golang
       shell: |
         wget -q https://go.dev/dl/go{{ go_version }}.linux-amd64.tar.gz
@@ -21,35 +33,51 @@
       args:
         creates: /usr/local/go
 
-    - name: Clone and Build Evilginx
-      shell:
-        cmd: |
-          export PATH=$PATH:/usr/local/go/bin
-          git clone https://github.com/kgretzky/evilginx2.git .
-          make
-        chdir: "{{ install_path }}"
-        creates: "{{ install_path }}/build/evilginx"
-
     - name: Create directories
       file:
         path: "{{ item }}"
         state: directory
       loop:
+        - "{{ install_path }}"
         - "{{ install_path }}/phishlets"
-        - "{{ install_path }}/scripts"
+        - "{{ scripts_path }}"
+
+    - name: Clone Evilginx source
+      git:
+        repo: https://github.com/kgretzky/evilginx2.git
+        dest: "{{ install_path }}/src"
+        force: yes
+
+    - name: Build Evilginx
+      shell:
+        cmd: |
+          export PATH=$PATH:/usr/local/go/bin
+          make
+        chdir: "{{ install_path }}/src"
+        creates: "{{ install_path }}/src/build/evilginx"
+
+    - name: Create symlink for evilginx command
+      file:
+        src: "{{ install_path }}/src/build/evilginx"
+        dest: /usr/local/bin/evilginx
+        state: link
+
+    - name: Copy example phishlet
+      command: "cp {{ install_path }}/src/phishlets/example.yaml {{ install_path }}/phishlets/"
+      args:
+        creates: "{{ install_path }}/phishlets/example.yaml"
 
     - name: Copy firewall scripts
       copy:
         src: files/
-        dest: "{{ install_path }}/scripts/"
+        dest: "{{ scripts_path }}/"
         mode: '0755'
 
-    # KLUCZOWY DODATEK: Inicjalizacja bazy IP, żeby firewall miał na czym pracować
     - name: Initialize GeoIP database
-      command: "{{ install_path }}/scripts/update_ips.sh"
+      command: "{{ scripts_path }}/update_ips.sh"
       changed_when: true
 
-    - name: Setup Systemd Service
+    - name: Setup Systemd Service (Ready but NOT started)
       copy:
         dest: /etc/systemd/system/evilginx.service
         content: |
@@ -60,15 +88,8 @@
           [Service]
           Type=simple
           WorkingDirectory={{ install_path }}
-          ExecStart={{ install_path }}/build/evilginx -p {{ install_path }}/phishlets
+          ExecStart=/usr/local/bin/evilginx -p {{ install_path }}/phishlets
           Restart=always
 
           [Install]
           WantedBy=multi-user.target
-
-    - name: Start Evilginx
-      systemd:
-        name: evilginx
-        state: started
-        enabled: yes
-        daemon_reload: yes
