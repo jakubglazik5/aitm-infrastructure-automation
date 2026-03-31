@@ -136,7 +136,7 @@ You can check your router's public address by connecting to your network and ent
 curl ifconfig.me
 ```
 
-To switch our geoblocking to the IP addresses of a country other than Poland, simply change the COUNTRY_CODE in the update_ips.sh file. It is best to change this before running the inventory.ini file.
+To switch our geoblocking to the IP addresses of a country other than Poland, simply change the COUNTRY_CODE in the update_ips.sh and close_ports.sh files. It is best to change this before running the inventory.ini file.
 
 Example based on Germany:
 ```bash

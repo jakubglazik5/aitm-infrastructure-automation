@@ -139,7 +139,7 @@ Adres publiczny swojego routera sprawdzicie łącząc się do swojej sieci i wpi
 curl ifconfig.me
 ```
 
-Jeśli chodzi przestawienie naszego geoblockingu na adresy ip kraju innego niż Polska, to wystarczy w pliku update_ips.sh zmienić COUNTRY_CODE. Najlepiej zmienić to przed uruchomieniem pliku inventory.ini.
+Jeśli chodzi przestawienie naszego geoblockingu na adresy ip kraju innego niż Polska, to wystarczy w plikach update_ips.sh oraz close_ports.sh zmienić COUNTRY_CODE. Najlepiej zmienić to przed uruchomieniem pliku inventory.ini.
 
 Przykład na podstawie Niemiec:
 

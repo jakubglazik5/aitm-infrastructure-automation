@@ -13,7 +13,7 @@ echo "[1/4] Downloading latest IP list from ipdeny.com"
 if curl -s -f -o $TMP_FILE $URL; then
     echo "Download successful."
 else
-    echo "ERROR: Failed to download."
+    echo "ERROR: Download failed."
     exit 1
 fi
 
