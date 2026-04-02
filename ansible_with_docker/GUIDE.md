@@ -1,3 +1,5 @@
+**[Polska Instrukcja](GUIDE_pl.md)**
+
 # Deployment and Usage Guide
 
 ## Prerequisites
