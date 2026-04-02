@@ -1,4 +1,4 @@
-**[Polska_Wersja](README_pl.md)**
+**[Polska Wersja](README_pl.md)**
 
 # Adversary-in-the-Middle (AitM) Infrastructure Automation
 
