@@ -1,3 +1,6 @@
+**English Version**
+(README.md)
+
 # Adversary-in-the-Middle (AitM) Infrastructure Automation
 
 ## O projekcie
