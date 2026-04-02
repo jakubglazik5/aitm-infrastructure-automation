@@ -1,3 +1,5 @@
+**[English GUIDE](GUIDE.md)**
+
 # Instrukcja Wdrożenia i Użytkowania
 
 ## Wymagania Wstępne
