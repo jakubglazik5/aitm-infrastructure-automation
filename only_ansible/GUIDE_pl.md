@@ -1,4 +1,4 @@
-**[English Version](GUIDE.md)**
+**[English Guide](GUIDE.md)**
 
 # Instrukcja Wdrożenia i Użytkowania
 
